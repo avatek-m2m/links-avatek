@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregador de Links</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://github.com/vmacagnani/api-pre-os/raw/main/favicon.ico">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border-top-color: #4f46e5; /* Indigo color for dark mode */
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar for a better dark mode experience */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; /* gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5; /* indigo-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca; /* indigo-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6">
+        
+        <header class="text-center mb-10">
+            <!-- Logo -->
+            <img src="https://raw.githubusercontent.com/avatek-m2m/apps-avatek/refs/heads/main/Avatek-logo-2.svg" alt="Logo" class="mx-auto h-16 w-auto mb-4">
+            <h1 class="text-4xl font-bold text-white">Meu Agregador de Links</h1>
+            <p class="text-gray-400 mt-2">Um lugar central para todos os seus links importantes.</p>
+        </header>
+
+        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg mb-10">
+            <h2 class="text-2xl font-semibold mb-4 text-white">Adicionar Novo Link</h2>
+            <form id="add-link-form" class="space-y-4">
+                <div>
+                    <label for="link-title" class="block text-sm font-medium text-gray-300">Título</label>
+                    <input type="text" id="link-title" name="title" placeholder="Ex: Ferramenta de Design Incrível" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="link-url" class="block text-sm font-medium text-gray-300">URL</label>
+                    <input type="url" id="link-url" name="url" placeholder="https://exemplo.com" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <button type="submit" id="submit-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                    Adicionar Link
+                </button>
+            </form>
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-white">Links Salvos</h2>
+                <button id="reload-button" title="Recarregar Links" class="p-2 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <!-- Ícone de Recarregar -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"></path>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                        <path d="M3 22v-6h6"></path>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="loader" class="text-center py-10">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-700 h-12 w-12 mx-auto"></div>
+                <p class="mt-4 text-gray-500">Carregando links...</p>
+            </div>
+
+            <div id="links-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <!-- Links serão inseridos aqui -->
+            </div>
+
+            <div id="empty-state" class="hidden text-center py-10 bg-gray-800 border border-gray-700 rounded-xl shadow-lg">
+                <p class="text-gray-500">Nenhum link encontrado.</p>
+                <p class="text-sm text-gray-400 mt-2">Adicione seu primeiro link usando o formulário acima!</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const googleSheetWebAppUrl = 'URL_DO_SEU_WEB_APP_AQUI';
+
+        const form = document.getElementById('add-link-form');
+        const linksContainer = document.getElementById('links-container');
+        const loader = document.getElementById('loader');
+        const emptyState = document.getElementById('empty-state');
+        const submitButton = document.getElementById('submit-button');
+        const reloadButton = document.getElementById('reload-button');
+
+        function renderLinks(links) {
+            linksContainer.innerHTML = '';
+            
+            if (links.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                links.reverse().forEach(link => {
+                    // Ícone genérico de link (SVG)
+                    const linkCard = `
+                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" 
+                           class="flex flex-col items-center justify-center text-center p-4 bg-gray-800 border border-gray-700 rounded-xl shadow-lg hover:bg-gray-700 hover:border-indigo-500 transition-all duration-300 aspect-square group">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 text-gray-500 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            <h3 class="font-semibold text-sm text-gray-200 break-words w-full">${link.titulo}</h3>
+                        </a>
+                    `;
+                    linksContainer.insertAdjacentHTML('beforeend', linkCard);
+                });
+            }
+        }
+
+        async function fetchLinks() {
+            loader.classList.remove('hidden');
+            linksContainer.innerHTML = '';
+            emptyState.classList.add('hidden');
+
+            if (googleSheetWebAppUrl === 'URL_DO_SEU_WEB_APP_AQUI') {
+                console.error("URL do Web App não configurada.");
+                loader.classList.add('hidden');
+                linksContainer.innerHTML = '<p class="text-center text-red-500">Por favor, configure a URL do seu Web App do Google Sheets no script.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${googleSheetWebAppUrl}?cache_bust=${new Date().getTime()}`);
+                if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
+                const data = await response.json();
+                renderLinks(data.links);
+            } catch (error) {
+                console.error('Falha ao buscar links:', error);
+                linksContainer.innerHTML = '<p class="text-center text-red-500">Não foi possível carregar os links.</p>';
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        async function addLink(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Adicionando...';
+
+            try {
+                const response = await fetch(googleSheetWebAppUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) throw new Error(`Erro ao enviar: ${response.statusText}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    form.reset();
+                    fetchLinks();
+                } else {
+                    throw new Error(result.message || 'Ocorreu um erro desconhecido.');
+                }
+            } catch (error) {
+                console.error('Falha ao adicionar link:', error);
+                alert(`Erro: ${error.message}`);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchLinks);
+        form.addEventListener('submit', addLink);
+        reloadButton.addEventListener('click', fetchLinks);
+    </script>
+</body>
+</html>
