@@ -12,40 +12,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- A biblioteca LDRS foi removida para garantir estabilidade -->
+    <!-- LDRS Loader Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         
-        /* Novo Loader com CSS puro */
-        .loader-dots div {
-            animation: pulse 1.5s infinite ease-in-out;
-            background-color: #4f46e5; /* indigo-600 */
-            border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            margin: 0 4px;
-        }
-
-        .loader-dots div:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loader-dots div:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(0.3);
-                opacity: 0.5;
-            }
-            50% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+        /* O loader de CSS puro foi removido */
         
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -106,12 +80,12 @@
             </div>
             
             <div id="loader" class="flex flex-col items-center justify-center py-10">
-                <!-- Novo Loader com CSS puro -->
-                <div class="loader-dots flex">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
+                <!-- Loader 'Newton's Cradle' da LDRS -->
+                <l-newtons-cradle
+                  size="70"
+                  speed="1.4" 
+                  color="#4f46e5" 
+                ></l-newtons-cradle>
                 <p class="mt-4 text-gray-500">Carregando links...</p>
             </div>
 
