@@ -12,15 +12,42 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- LDRS Loader Library -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto.js"></script>
+    <!-- A biblioteca LDRS foi removida para garantir estabilidade -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* O loader antigo e a animação 'spin' foram removidos */
         
-        /* Custom scrollbar for a better dark mode experience */
+        /* Novo Loader com CSS puro */
+        .loader-dots div {
+            animation: pulse 1.5s infinite ease-in-out;
+            background-color: #4f46e5; /* indigo-600 */
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            margin: 0 4px;
+        }
+
+        .loader-dots div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loader-dots div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(0.3);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -79,12 +106,12 @@
             </div>
             
             <div id="loader" class="flex flex-col items-center justify-center py-10">
-                <!-- Novo Loader 'Newton's Cradle' da LDRS -->
-                <l-newtons-cradle
-                  size="70"
-                  speed="1.4" 
-                  color="#4f46e5" 
-                ></l-newtons-cradle>
+                <!-- Novo Loader com CSS puro -->
+                <div class="loader-dots flex">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
                 <p class="mt-4 text-gray-500">Carregando links...</p>
             </div>
 
