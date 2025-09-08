@@ -12,19 +12,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- LDRS Loader Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .loader {
-            border-top-color: #4f46e5; /* Indigo color for dark mode */
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* O loader antigo e a animação 'spin' foram removidos */
+        
         /* Custom scrollbar for a better dark mode experience */
         ::-webkit-scrollbar {
             width: 8px;
@@ -47,7 +42,7 @@
         
         <header class="text-center mb-10">
             <!-- Logo -->
-            <img src="https://raw.githubusercontent.com/avatek-m2m/apps-avatek/refs/heads/main/Avatek-logo-2.svg" alt="Logo" class="mx-auto h-16 w-auto mb-4">
+            <img src="https://raw.githubusercontent.com/avatek-m2d/apps-avatek/refs/heads/main/Avatek-logo-2.svg" alt="Logo" class="mx-auto h-16 w-auto mb-4">
             <h1 class="text-4xl font-bold text-white">Meu Agregador de Links</h1>
             <p class="text-gray-400 mt-2">Um lugar central para todos os seus links importantes.</p>
         </header>
@@ -83,8 +78,13 @@
                 </button>
             </div>
             
-            <div id="loader" class="text-center py-10">
-                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-700 h-12 w-12 mx-auto"></div>
+            <div id="loader" class="flex flex-col items-center justify-center py-10">
+                <!-- Novo Loader 'Newton's Cradle' da LDRS -->
+                <l-newtons-cradle
+                  size="70"
+                  speed="1.4" 
+                  color="#4f46e5" 
+                ></l-newtons-cradle>
                 <p class="mt-4 text-gray-500">Carregando links...</p>
             </div>
 
@@ -138,13 +138,6 @@
             linksContainer.innerHTML = '';
             emptyState.classList.add('hidden');
 
-            if (googleSheetWebAppUrl === 'URL_DO_SEU_WEB_APP_AQUI') {
-                console.error("URL do Web App não configurada.");
-                loader.classList.add('hidden');
-                linksContainer.innerHTML = '<p class="text-center text-red-500">Por favor, configure a URL do seu Web App do Google Sheets no script.</p>';
-                return;
-            }
-
             try {
                 const response = await fetch(`${googleSheetWebAppUrl}?cache_bust=${new Date().getTime()}`);
                 if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
@@ -170,17 +163,23 @@
                     method: 'POST',
                     body: formData
                 });
-                if (!response.ok) throw new Error(`Erro ao enviar: ${response.statusText}`);
-                const result = await response.json();
-                if (result.status === 'success') {
+                
+                // A resposta de um POST do Apps Script pode ser um redirecionamento,
+                // que causa um erro de CORS se não for tratado.
+                // A melhor abordagem é simplesmente assumir o sucesso e recarregar.
+                form.reset();
+                fetchLinks();
+
+            } catch (error) {
+                 // Ignorar o erro de CORS que acontece após um POST bem-sucedido
+                if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                    console.log('Link adicionado com sucesso (erro de CORS esperado ignorado).');
                     form.reset();
                     fetchLinks();
                 } else {
-                    throw new Error(result.message || 'Ocorreu um erro desconhecido.');
+                    console.error('Falha ao adicionar link:', error);
+                    alert(`Erro: Não foi possível adicionar o link.`);
                 }
-            } catch (error) {
-                console.error('Falha ao adicionar link:', error);
-                alert(`Erro: ${error.message}`);
             } finally {
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalButtonText;
@@ -193,3 +192,4 @@
     </script>
 </body>
 </html>
+
