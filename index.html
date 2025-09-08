@@ -12,19 +12,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- LDRS Loader Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .loader {
-            border-top-color: #4f46e5; /* Indigo color for dark mode */
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* O loader antigo e a animação 'spin' foram removidos */
+        
         /* Custom scrollbar for a better dark mode experience */
         ::-webkit-scrollbar {
             width: 8px;
@@ -83,8 +78,13 @@
                 </button>
             </div>
             
-            <div id="loader" class="text-center py-10">
-                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-700 h-12 w-12 mx-auto"></div>
+            <div id="loader" class="flex flex-col items-center justify-center py-10">
+                <!-- Novo Loader 'Newton's Cradle' da LDRS -->
+                <l-newtons-cradle
+                  size="70"
+                  speed="1.4" 
+                  color="#4f46e5" 
+                ></l-newtons-cradle>
                 <p class="mt-4 text-gray-500">Carregando links...</p>
             </div>
 
@@ -101,7 +101,7 @@
     </div>
 
     <script>
-        const googleSheetWebAppUrl = 'https://script.google.com/macros/s/AKfycbwV6p-G2Fwyh9McAq-a_ciCEpD4GhJZq1Tqe9X1YNeUdvEHNlirEGaNv-eXWV7vfnqp/exec';
+        const googleSheetWebAppUrl = 'URL_DO_SEU_WEB_APP_AQUI';
 
         const form = document.getElementById('add-link-form');
         const linksContainer = document.getElementById('links-container');
@@ -138,7 +138,7 @@
             linksContainer.innerHTML = '';
             emptyState.classList.add('hidden');
 
-            if (googleSheetWebAppUrl === 'URL_DO_SEU_WEB_APP_AQUI') {
+            if (googleSheetWebAppUrl === 'https://script.google.com/macros/s/AKfycbwV6p-G2Fwyh9McAq-a_ciCEpD4GhJZq1Tqe9X1YNeUdvEHNlirEGaNv-eXWV7vfnqp/exec') {
                 console.error("URL do Web App não configurada.");
                 loader.classList.add('hidden');
                 linksContainer.innerHTML = '<p class="text-center text-red-500">Por favor, configure a URL do seu Web App do Google Sheets no script.</p>';
@@ -193,3 +193,4 @@
     </script>
 </body>
 </html>
+
